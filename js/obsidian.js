@@ -1259,5 +1259,8 @@ $(function () {
   utiliseBgColor();
   initialTyped();
   Obsidian.setCodeRowWithLang();
-  console.log("%c Github %c", "background:#24272A; color:#73ddd7", "", "https://github.com/swyiic");
+  console.log("%c  ╭╯╭══╮　┌════════┐ '\n'╭╯ 闭嘴║═║ -快上车- ║ '\n'╰╰⊙══⊙╯　└═⊙════⊙═  ------- %c", "background:#FFFFFF; color:#73ddd7", "");
+  
+  console.log("|==================================|")
+  console.log("%c ꧁Swyiic꧂  %c", "background:#DDFFF1; color:#00AA22", "");
 });
