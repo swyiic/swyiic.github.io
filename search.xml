@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>充满疑惑的一天</title>
+      <link href="/2019/12/19/%E5%85%85%E6%BB%A1%E7%96%91%E6%83%91%E7%9A%84%E4%B8%80%E5%A4%A9/"/>
+      <url>/2019/12/19/%E5%85%85%E6%BB%A1%E7%96%91%E6%83%91%E7%9A%84%E4%B8%80%E5%A4%A9/</url>
+      
+        <content type="html"><![CDATA[<h2 id="主机入侵检测-通常分为agent和server两个部分"><a href="#主机入侵检测-通常分为agent和server两个部分" class="headerlink" title="主机入侵检测, 通常分为agent和server两个部分"></a>主机入侵检测, 通常分为agent和server两个部分</h2><p>其中agent负责收集信息, 并将相关信息整理后发送给server.</p><p>server通常作为信息中心, 部署由安全人员编写的规则(目前HIDS的规则还没有一个编写的规范),收集从各种安全组件获取的数据(这些数据也可能来自waf, NIDS等), 进行分析, 根据规则判断主机行为是否异常, 并对主机的异常行为进行告警和提示.</p><p>HIDS存在的目的在于在管理员管理海量IDC时不会被安全事件弄的手忙脚乱, 可以通过信息中心对每一台主机的健康状态进行监视.</p><p>相关的开源项目有OSSEC, OSquery等, OSSEC是一个已经构建完善的HIDS, 有agent端和server端, 有自带的规则, 基础的rootkit检测, 敏感文件修改提醒等功能, 并且被包含到了一个叫做wazuh的开源项目, OSquery是一个facebook研发的开源项目, 可以作为一个agent端对主机相关数据进行收集, 但是server和规则需要自己实现.</p><p>每一个公司的HIDS agent都会根据自身需要定制, 或多或少的增加一些个性化的功能, 一个基础的HIDS agent一般需要实现的有:</p><p>•收集进程信息<br>•收集网络信息<br>•周期性的收集开放端口<br>•监控敏感文件修</p><p>下文将从实现一个agent入手, 围绕agent讨论如何实现一个HIDS agent的进程信息收集模块</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>老子名言</title>
       <link href="/2019/12/19/%E6%96%B0%E7%9A%84%E8%B5%B7%E7%82%B9/"/>
       <url>/2019/12/19/%E6%96%B0%E7%9A%84%E8%B5%B7%E7%82%B9/</url>
